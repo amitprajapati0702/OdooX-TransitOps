@@ -30,7 +30,7 @@ export const driverCreateSchema = z.object({
   fullName: z.string().trim().min(2),
   licenseNumber: z.string().trim().min(3),
   licenseCategory: z.string().trim().min(1),
-  licenseExpiryDate: z.coerce.date(),
+  licenseExpiryDate: z.string().min(1),
   contactNumber: z.string().trim().min(5),
   safetyScore: z.coerce.number().min(0).max(100).default(100),
   status: driverStatus.optional().default("Available"),
@@ -41,7 +41,7 @@ export const driverUpdateSchema = z.object({
   fullName: z.string().trim().min(2).optional(),
   licenseNumber: z.string().trim().min(3).optional(),
   licenseCategory: z.string().trim().min(1).optional(),
-  licenseExpiryDate: z.coerce.date().optional(),
+  licenseExpiryDate: z.string().optional(),
   contactNumber: z.string().trim().min(5).optional(),
   safetyScore: z.coerce.number().min(0).max(100).optional(),
   status: driverStatus.optional(),
@@ -51,8 +51,8 @@ export const driverUpdateSchema = z.object({
 export const tripCreateSchema = z.object({
   source: z.string().trim().min(2),
   destination: z.string().trim().min(2),
-  vehicleId: z.coerce.number().int().positive(),
-  driverId: z.coerce.number().int().positive(),
+  vehicleId: z.string().uuid("Invalid vehicle ID format"),
+  driverId: z.string().uuid("Invalid driver ID format"),
   cargoWeightKg: z.coerce.number().positive(),
   plannedDistanceKm: z.coerce.number().positive(),
   revenue: z.coerce.number().nonnegative().default(0),
@@ -68,7 +68,7 @@ export const tripCompleteSchema = z.object({
 });
 
 export const maintenanceCreateSchema = z.object({
-  vehicleId: z.coerce.number().int().positive(),
+  vehicleId: z.string().uuid("Invalid vehicle ID format"),
   maintenanceType: z.string().trim().min(2),
   title: z.string().trim().min(2),
   description: z.string().trim().optional().nullable(),
@@ -76,25 +76,25 @@ export const maintenanceCreateSchema = z.object({
 });
 
 export const maintenanceCloseSchema = z.object({
-  closedAt: z.coerce.date().optional(),
+  closedAt: z.string().optional(),
 });
 
 export const fuelLogCreateSchema = z.object({
-  vehicleId: z.coerce.number().int().positive(),
-  tripId: z.coerce.number().int().positive().optional().nullable(),
+  vehicleId: z.string().uuid("Invalid vehicle ID format"),
+  tripId: z.string().uuid("Invalid trip ID format").optional().nullable().or(z.literal("")),
   liters: z.coerce.number().positive(),
   cost: z.coerce.number().nonnegative(),
-  odometer: z.coerce.number().nonnegative().optional().nullable(),
-  loggedAt: z.coerce.date().optional(),
+  odometer: z.coerce.number().nonnegative().optional().nullable().or(z.literal("")),
+  loggedAt: z.string().optional(),
 });
 
 export const expenseCreateSchema = z.object({
-  vehicleId: z.coerce.number().int().positive().optional().nullable(),
-  tripId: z.coerce.number().int().positive().optional().nullable(),
+  vehicleId: z.string().uuid("Invalid vehicle ID format").optional().nullable().or(z.literal("")),
+  tripId: z.string().uuid("Invalid trip ID format").optional().nullable().or(z.literal("")),
   category: expenseCategory,
   description: z.string().trim().optional().nullable(),
   amount: z.coerce.number().positive(),
-  occurredAt: z.coerce.date().optional(),
+  occurredAt: z.string().optional(),
 });
 
 export const dashboardQuerySchema = z.object({

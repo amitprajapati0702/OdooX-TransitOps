@@ -1,6 +1,6 @@
 import { z } from "zod";
 
 export const uploadVehicleDocumentSchema = z.object({
-  vehicleId: z.coerce.number().int().positive(),
+  vehicleId: z.string().uuid("Invalid vehicle ID format"),
   documentType: z.string().trim().min(2).default("Other"),
 });
