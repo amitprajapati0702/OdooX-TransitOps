@@ -9,6 +9,7 @@ export const findUserByEmailAndRole = async (email, role) => {
             u.email,
             u.password_hash,
             u.is_active,
+            u.is_verified,
             r.role_name
 
         FROM users u
