@@ -1,101 +1,81 @@
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
-const getTokenConfig = () => {
-    const {
-        JWT_ACCESS_SECRET,
-        JWT_REFRESH_SECRET,
-        ACCESS_TOKEN_EXPIRES,
-        REFRESH_TOKEN_EXPIRES
-    } = process.env;
+const {
+  JWT_ACCESS_SECRET,
+  JWT_REFRESH_SECRET,
+  ACCESS_TOKEN_EXPIRES = "15m",
+  REFRESH_TOKEN_EXPIRES = "7d",
+} = process.env;
 
-    if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
-        throw new Error("JWT secrets are not configured.");
-    }
+if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
+  throw new Error("JWT secrets are not configured.");
+}
 
-    return {
-        JWT_ACCESS_SECRET,
-        JWT_REFRESH_SECRET,
-        ACCESS_TOKEN_EXPIRES: ACCESS_TOKEN_EXPIRES || "15m",
-        REFRESH_TOKEN_EXPIRES: REFRESH_TOKEN_EXPIRES || "7d"
-    };
+const JWT_OPTIONS = {
+  issuer: "TransitOps",
+  audience: "TransitOps-App",
+};
+
+/**
+ * Generate unique JWT ID.
+ */
+export const generateJti = () => {
+  return crypto.randomUUID();
 };
 
 /**
  * Generate Access Token
  */
-export const generateAccessToken = (payload) => {
-
-    const {
-        JWT_ACCESS_SECRET,
-        ACCESS_TOKEN_EXPIRES
-    } = getTokenConfig();
-
-    return jwt.sign(
-        payload,
-        JWT_ACCESS_SECRET,
-        {
-            expiresIn: ACCESS_TOKEN_EXPIRES
-        }
-    );
-
+export const generateAccessToken = ({ userId, email, role }) => {
+  return jwt.sign(
+    {
+      sub: userId,
+      email,
+      role,
+    },
+    JWT_ACCESS_SECRET,
+    {
+      expiresIn: ACCESS_TOKEN_EXPIRES,
+      ...JWT_OPTIONS,
+    },
+  );
 };
 
 /**
  * Generate Refresh Token
  */
-export const generateRefreshToken = (payload) => {
-
-    const {
-        JWT_REFRESH_SECRET,
-        REFRESH_TOKEN_EXPIRES
-    } = getTokenConfig();
-
-    return jwt.sign(
-        payload,
-        JWT_REFRESH_SECRET,
-        {
-            expiresIn: REFRESH_TOKEN_EXPIRES
-        }
-    );
-
+export const generateRefreshToken = ({ userId, jti }) => {
+  return jwt.sign(
+    {
+      sub: userId,
+      jti,
+    },
+    JWT_REFRESH_SECRET,
+    {
+      expiresIn: REFRESH_TOKEN_EXPIRES,
+      ...JWT_OPTIONS,
+    },
+  );
 };
 
 /**
  * Verify Access Token
  */
 export const verifyAccessToken = (token) => {
-
-    const { JWT_ACCESS_SECRET } = getTokenConfig();
-
-    return jwt.verify(
-        token,
-        JWT_ACCESS_SECRET
-    );
-
+  return jwt.verify(token, JWT_ACCESS_SECRET, JWT_OPTIONS);
 };
 
 /**
  * Verify Refresh Token
  */
 export const verifyRefreshToken = (token) => {
-
-    const { JWT_REFRESH_SECRET } = getTokenConfig();
-
-    return jwt.verify(
-        token,
-        JWT_REFRESH_SECRET
-    );
-
+  return jwt.verify(token, JWT_REFRESH_SECRET, JWT_OPTIONS);
 };
 
 /**
- * Decode Token
- *
- * Does NOT verify signature.
- * Useful only for debugging.
+ * Decode without verification.
  */
 export const decodeToken = (token) => {
-
-    return jwt.decode(token);
-
+  return jwt.decode(token);
 };

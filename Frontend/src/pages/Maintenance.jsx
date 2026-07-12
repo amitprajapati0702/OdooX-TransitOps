@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 
 // Schema for creating maintenance ticket
 const maintenanceSchema = z.object({
-  vehicleId: z.coerce.number().int().positive("Please select a vehicle"),
+  vehicleId: z.string().uuid("Please select a vehicle"),
   maintenanceType: z.string().trim().min(2, "Maintenance type is required (e.g. Oil Change, Repair)"),
   title: z.string().trim().min(2, "Issue summary / title is required"),
   description: z.string().trim().optional(),
@@ -72,7 +72,7 @@ export default function Maintenance() {
     return vehicles.filter(v => v.status !== "Retired");
   }, [vehicles]);
 
-  const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -107,7 +107,7 @@ export default function Maintenance() {
                   {...register("maintenanceType")}
                 />
                 <Input
-                  label="Estimated Cost ($)"
+                  label="Estimated Cost (₹)"
                   type="number"
                   placeholder="250"
                   error={errors.cost}

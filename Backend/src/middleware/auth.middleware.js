@@ -20,7 +20,7 @@ const protect = async (req, res, next) => {
 
     const payload = verifyAccessToken(token);
 
-    const user = await findUserById(payload.userId);
+    const user = await findUserById(payload.sub);
 
     if (!user) {
       throw new ApiError(

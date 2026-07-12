@@ -25,8 +25,8 @@ import toast from "react-hot-toast";
 const tripSchema = z.object({
   source: z.string().trim().min(2, "Source location is required"),
   destination: z.string().trim().min(2, "Destination location is required"),
-  vehicleId: z.coerce.number().int().positive("Select an available vehicle"),
-  driverId: z.coerce.number().int().positive("Select an available driver"),
+  vehicleId: z.string().uuid("Select an available vehicle"),
+  driverId: z.string().uuid("Select an available driver"),
   cargoWeightKg: z.coerce.number().positive("Cargo weight must be a positive number"),
   plannedDistanceKm: z.coerce.number().positive("Distance must be positive"),
   revenue: z.coerce.number().nonnegative("Revenue cannot be negative"),
@@ -156,7 +156,7 @@ export default function Trips() {
     }
   };
 
-  const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -232,7 +232,7 @@ export default function Trips() {
 
               <div className="grid grid-cols-2 gap-4">
                 <Input
-                  label="Estimated Revenue ($)"
+                  label="Estimated Revenue (₹)"
                   type="number"
                   placeholder="1500"
                   error={errors.revenue}
@@ -435,7 +435,7 @@ export default function Trips() {
               {...registerComplete("actualDistanceKm")}
             />
             <Input
-              label="Closing Revenue ($ - Optional)"
+              label="Closing Revenue (₹ - Optional)"
               type="number"
               placeholder="e.g. 1550"
               error={errorsComplete.revenue}

@@ -11,8 +11,8 @@ import { Fuel, Receipt, DollarSign, Wallet, FileSpreadsheet } from "lucide-react
 
 // Schema for fuel log submission
 const fuelLogSchema = z.object({
-  vehicleId: z.coerce.number().int().positive("Select a vehicle"),
-  tripId: z.coerce.number().int().positive("Select associated trip").optional().nullable().or(z.literal("")),
+  vehicleId: z.string().uuid("Select a vehicle"),
+  tripId: z.string().uuid("Select associated trip").optional().nullable().or(z.literal("")),
   liters: z.coerce.number().positive("Liters must be a positive number"),
   cost: z.coerce.number().nonnegative("Cost cannot be negative"),
   odometer: z.coerce.number().nonnegative("Odometer reading cannot be negative").optional().nullable().or(z.literal("")),
@@ -20,8 +20,8 @@ const fuelLogSchema = z.object({
 
 // Schema for expense submission
 const expenseSchema = z.object({
-  vehicleId: z.coerce.number().int().positive().optional().nullable().or(z.literal("")),
-  tripId: z.coerce.number().int().positive().optional().nullable().or(z.literal("")),
+  vehicleId: z.string().uuid("Select a vehicle").optional().nullable().or(z.literal("")),
+  tripId: z.string().uuid("Select a trip").optional().nullable().or(z.literal("")),
   category: z.enum(["Fuel", "Maintenance", "Toll", "Parking", "Misc"]),
   description: z.string().trim().min(2, "Description is required"),
   amount: z.coerce.number().positive("Amount must be a positive value"),
@@ -96,7 +96,7 @@ export default function Finance() {
     }
   };
 
-  const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
   // Calculate quick metrics for financial analysis
   const financeStats = expenses.reduce((acc, curr) => {
@@ -185,7 +185,7 @@ export default function Finance() {
                   {...registerFuel("liters")}
                 />
                 <Input
-                  label="Total Cost ($)"
+                  label="Total Cost (₹)"
                   type="number"
                   placeholder="e.g. 75"
                   error={errorsFuel.cost}
@@ -265,7 +265,7 @@ export default function Finance() {
                   />
                 </div>
                 <Input
-                  label="Amount ($)"
+                  label="Amount (₹)"
                   type="number"
                   placeholder="e.g. 15"
                   error={errorsExpense.amount}

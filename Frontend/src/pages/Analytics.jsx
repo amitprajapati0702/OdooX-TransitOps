@@ -7,9 +7,9 @@ import { Download, BarChart4, Route, Fuel, TrendingUp } from "lucide-react";
 export default function Analytics() {
   const { analytics, trips, exportCsv, loading } = useOperations();
 
-  const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-  const compact = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
-  const percent = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
+  const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+  const compact = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 1 });
+  const percent = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 1 });
 
   return (
     <div className="space-y-6">

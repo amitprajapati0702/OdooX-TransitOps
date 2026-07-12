@@ -39,8 +39,8 @@ export default function Overview() {
   };
 
   // Helper formatting values
-  const compact = new Intl.NumberFormat("en-US", { maximumFractionDigits: 1 });
-  const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  const compact = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 1 });
+  const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
   // Calculate status statistics from active vehicles list
   const vehicleStats = vehicles.reduce(

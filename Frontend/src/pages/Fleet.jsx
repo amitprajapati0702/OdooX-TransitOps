@@ -79,8 +79,8 @@ export default function Fleet() {
     return Array.from(new Set(types));
   }, [vehicles]);
 
-  const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-  const compact = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+  const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
+  const compact = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
 
   return (
     <div className="space-y-6">
@@ -247,7 +247,7 @@ export default function Fleet() {
               {...register("odometer")}
             />
             <Input
-              label="Acquisition Cost ($)"
+              label="Acquisition Cost (₹)"
               type="number"
               placeholder="12000"
               error={errors.acquisitionCost}
