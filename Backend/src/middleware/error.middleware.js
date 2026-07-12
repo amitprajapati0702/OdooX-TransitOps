@@ -2,15 +2,17 @@ const errorMiddleware = (err, req, res, next) => {
 
     console.error(err);
 
-    const statusCode = err.statusCode || 500;
-
-    res.status(statusCode).json({
+     return res.status(err.statusCode || 500).json({
 
         success: false,
 
-        message: err.message || "Internal Server Error"
+        message: err.message || "Internal Server Error",
+
+        errors: err.errors || null
 
     });
+
+    
 
 };
 
