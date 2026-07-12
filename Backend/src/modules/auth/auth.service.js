@@ -1,88 +1,56 @@
-import {
-    findUserByEmailAndRole
-} from "./auth.repository.js";
+import { findUserByEmailAndRole } from "./auth.repository.js";
+import { ApiError } from "../../errors/ApiError.js";
 
-import {
-    comparePassword
-} from "../../utils/password.js";
+import { comparePassword } from "../../utils/password.js";
+import { createSession } from "./session.service.js";
+import { generateAccessToken, generateRefreshToken } from "./token.service.js";
+import crypto from "crypto"
 
-import {
-    generateAccessToken,
-    generateRefreshToken
-} from "../../utils/jwt.js";
+export const login = async ({ email, password, role }) => {
+    const sessionId = crypto.randomUUID()
+  const user = await findUserByEmailAndRole(email, role);
 
-export const login = async ({
-    email,
-    password,
-    role
-}) => {
+  if (!user) {
+    throw new ApiError("Invalid email or password.");
+  }
 
-    const user =
-        await findUserByEmailAndRole(
-            email,
-            role
-        );
+  if (!user.is_active) {
+    throw new ApiError("Account disabled.");
+  }
 
-    if (!user) {
+  const matched = await comparePassword(password, user.password_hash);
 
-        throw new Error(
-            "Invalid email or password."
-        );
+  if (!matched) {
+    throw new ApiError("Invalid email or password.");
+  }
 
-    }
+  const payload = {
+    userId: user.user_id,
 
-    if (!user.is_active) {
+    email: user.email,
 
-        throw new Error(
-            "Account disabled."
-        );
+    role: user.role_name,
 
-    }
+    sessionId:sessionId
 
-    const matched =
-        await comparePassword(
-            password,
-            user.password_hash
-        );
+  };
 
-    if (!matched) {
+  const accessToken = generateAccessToken(payload);
 
-        throw new Error(
-            "Invalid email or password."
-        );
+  const refreshToken = generateRefreshToken(payload);
 
-    }
+  await createSession(
+  user.user_id,
+  sessionId,
+  refreshToken
+);
 
-    const payload = {
+  const { password_hash, ...safeUser } = user;
+  return {
+    user: safeUser,
 
-        userId: user.user_id,
+    accessToken,
 
-        email: user.email,
-
-        role: user.role_name
-
-    };
-
-    const accessToken =
-        generateAccessToken(payload);
-
-    const refreshToken =
-        generateRefreshToken(payload);
-
-    delete user.password_hash;
-
-    return {
-
-        success: true,
-
-        message: "Login Successful",
-
-        accessToken,
-
-        refreshToken,
-
-        user
-
-    };
-
+    refreshToken,
+  };
 };
