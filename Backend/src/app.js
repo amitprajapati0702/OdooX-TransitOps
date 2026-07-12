@@ -3,7 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import routes from "./routes/index.route.js"
-import notFoundMiddleware from "./middleware/notFound.middleware.js";
+import notFoundMiddleware from "./middleware/notfound.middleware.js";
 import errorMiddleware from "./middleware/error.middleware.js";
 
 const app = express();
@@ -27,9 +27,5 @@ app.use(notFoundMiddleware);
 
 // Error handler
 app.use(errorMiddleware);
-
-app.get("/health", (req, res) => {
-	res.json({ status: "ok" });
-});
 
 export default app;

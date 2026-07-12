@@ -80,7 +80,7 @@ export const updatePassword = async (
         SET
             password_hash=$1,
             updated_at=NOW()
-        WHERE id=$2;
+        WHERE user_id=$2;
         `,
         [
             passwordHash,
@@ -95,9 +95,9 @@ export const verifyEmail = async (userId) => {
         `
         UPDATE users
         SET
-            is_email_verified=TRUE,
+            is_verified=TRUE,
             updated_at=NOW()
-        WHERE id=$1;
+        WHERE user_id=$1;
         `,
         [userId]
     );
@@ -110,7 +110,7 @@ export const updateLastLogin = async (userId) => {
         UPDATE users
         SET
             last_login=NOW()
-        WHERE id=$1;
+        WHERE user_id=$1;
         `,
         [userId]
     );

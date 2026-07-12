@@ -11,17 +11,23 @@ export const login = async ({ email, password, role }) => {
   const user = await findUserByEmailAndRole(email, role);
 
   if (!user) {
-    throw new ApiError("Invalid email or password.");
+    throw new ApiError(401, "Invalid email or password.");
   }
 
   if (!user.is_active) {
-    throw new ApiError("Account disabled.");
+    throw new ApiError(403, "Account disabled.");
   }
 
-  const matched = await comparePassword(password, user.password_hash);
+  let matched = false;
+
+  if (user.password_hash && String(user.password_hash).startsWith("$2")) {
+    matched = await comparePassword(password, user.password_hash);
+  } else {
+    matched = password === String(user.password_hash ?? user.password ?? "");
+  }
 
   if (!matched) {
-    throw new ApiError("Invalid email or password.");
+    throw new ApiError(401, "Invalid email or password.");
   }
 
   const payload = {
@@ -39,11 +45,11 @@ export const login = async ({ email, password, role }) => {
 
   const refreshToken = generateRefreshToken(payload);
 
-  await createSession(
-  user.user_id,
-  sessionId,
-  refreshToken
-);
+  await createSession({
+    userId: user.user_id,
+    sessionId,
+    refreshToken,
+  });
 
   const { password_hash, ...safeUser } = user;
   return {

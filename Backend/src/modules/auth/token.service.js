@@ -1,16 +1,34 @@
 import jwt from "jsonwebtoken";
 
-const {
-    JWT_ACCESS_SECRET,
-    JWT_REFRESH_SECRET,
-    ACCESS_TOKEN_EXPIRES,
-    REFRESH_TOKEN_EXPIRES
-} = process.env;
+const getTokenConfig = () => {
+    const {
+        JWT_ACCESS_SECRET,
+        JWT_REFRESH_SECRET,
+        ACCESS_TOKEN_EXPIRES,
+        REFRESH_TOKEN_EXPIRES
+    } = process.env;
+
+    if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
+        throw new Error("JWT secrets are not configured.");
+    }
+
+    return {
+        JWT_ACCESS_SECRET,
+        JWT_REFRESH_SECRET,
+        ACCESS_TOKEN_EXPIRES: ACCESS_TOKEN_EXPIRES || "15m",
+        REFRESH_TOKEN_EXPIRES: REFRESH_TOKEN_EXPIRES || "7d"
+    };
+};
 
 /**
  * Generate Access Token
  */
 export const generateAccessToken = (payload) => {
+
+    const {
+        JWT_ACCESS_SECRET,
+        ACCESS_TOKEN_EXPIRES
+    } = getTokenConfig();
 
     return jwt.sign(
         payload,
@@ -27,6 +45,11 @@ export const generateAccessToken = (payload) => {
  */
 export const generateRefreshToken = (payload) => {
 
+    const {
+        JWT_REFRESH_SECRET,
+        REFRESH_TOKEN_EXPIRES
+    } = getTokenConfig();
+
     return jwt.sign(
         payload,
         JWT_REFRESH_SECRET,
@@ -42,6 +65,8 @@ export const generateRefreshToken = (payload) => {
  */
 export const verifyAccessToken = (token) => {
 
+    const { JWT_ACCESS_SECRET } = getTokenConfig();
+
     return jwt.verify(
         token,
         JWT_ACCESS_SECRET
@@ -53,6 +78,8 @@ export const verifyAccessToken = (token) => {
  * Verify Refresh Token
  */
 export const verifyRefreshToken = (token) => {
+
+    const { JWT_REFRESH_SECRET } = getTokenConfig();
 
     return jwt.verify(
         token,
